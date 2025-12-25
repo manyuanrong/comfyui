@@ -1,0 +1,26 @@
+{
+    "title": "Comfyui",
+    "description": "comfyui all in one",
+    "type": "serverless",
+    "category": "image",
+    "iconUrl": "https://cpjrphpz3t5wbwfe.public.blob.vercel-storage.com/comfy-ui.pn",
+    "config": {
+        "runsOn": "GPU",
+        "containerDiskInGb": 30,
+        "env": [
+            {
+                "key": "STATIC_VAR",
+                "value": "static_value"
+            },
+            {
+                "key": "STRING_VAR",
+                "input": {
+                    "name": "String Input",
+                    "type": "string",
+                    "description": "A string input test",
+                    "default": "new default value"
+                }
+            }
+        ]
+    }
+}

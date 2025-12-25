@@ -1,0 +1,1 @@
+[![Runpod](https://api.runpod.io/badge/manyuanrong/comfyui)](https://console.runpod.io/hub/manyuanrong/comfyui)
