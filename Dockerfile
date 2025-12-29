@@ -1,6 +1,6 @@
 FROM runpod/worker-comfyui:5.7.1-base
 
-RUN comfy-node-install comfyui-kjnodes rgthree-comfy
+RUN comfy-node-install comfyui-kjnodes rgthree-comfy ComfyUI_essentials LanPaint comfyui_controlnet_aux comfyui-inpaint-nodes ComfyUI-Easy-Use
 
 RUN comfy model download \
     --url https://huggingface.co/Comfy-Org/Qwen-Image_ComfyUI/resolve/main/split_files/text_encoders/qwen_2.5_vl_7b_fp8_scaled.safetensors \ 
@@ -18,6 +18,6 @@ RUN comfy model download \
     --filename qwen_image_vae.safetensors
 
 RUN comfy model download \
-    --url https://huggingface.co/Comfy-Org/Qwen-Image-Edit_ComfyUI/resolve/main/split_files/diffusion_models/qwen_image_edit_2511_bf16.safetensors \
+    --url https://huggingface.co/Comfy-Org/Qwen-Image-Edit_ComfyUI/resolve/main/split_files/diffusion_models/qwen_image_edit_2511_fp8mixed.safetensors \
     --relative-path models/diffusion_models \
-    --filename qwen_image_edit_2511_bf16.safetensors
+    --filename qwen_image_edit_2511_fp8mixed.safetensors
