@@ -1,6 +1,6 @@
 FROM runpod/worker-comfyui:5.7.1-base
 
-RUN comfy-node-install comfyui-kjnodes rgthree-comfy ComfyUI_essentials LanPaint comfyui_controlnet_aux comfyui-inpaint-nodes ComfyUI-Easy-Use ComfyUI_essentials
+RUN comfy-node-install comfyui-kjnodes rgthree-comfy ComfyUI_essentials LanPaint comfyui_controlnet_aux comfyui-inpaint-nodes ComfyUI-Easy-Use ComfyUI_essentials SDVN_Comfy_node
 
 RUN comfy model download \
     --url https://huggingface.co/Comfy-Org/Qwen-Image_ComfyUI/resolve/main/split_files/text_encoders/qwen_2.5_vl_7b_fp8_scaled.safetensors \ 
