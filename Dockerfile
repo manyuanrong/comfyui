@@ -1,6 +1,9 @@
 FROM runpod/worker-comfyui:5.7.1-base
 
-RUN comfy-node-install comfyui-kjnodes rgthree-comfy ComfyUI_essentials LanPaint comfyui_controlnet_aux comfyui-inpaint-nodes ComfyUI-Easy-Use
+RUN comfy-node-install comfyui-kjnodes rgthree-comfy ComfyUI_essentials LanPaint comfyui_controlnet_aux comfyui-inpaint-nodes
+
+RUN cd comfyui/custom_nodes && git clone https://github.com/yolain/ComfyUI-Easy-Use && pip install -r ComfyUI-Easy-Use/requirements.txt
+RUN cd comfyui/custom_nodes && git clone https://github.com/StableDiffusionVN/SDVN_Comfy_node && pip install -r SDVN_Comfy_node/requirements.txt
 
 RUN comfy model download \
     --url https://huggingface.co/Comfy-Org/Qwen-Image_ComfyUI/resolve/main/split_files/text_encoders/qwen_2.5_vl_7b_fp8_scaled.safetensors \ 
@@ -31,6 +34,3 @@ RUN comfy model download \
     --url https://huggingface.co/levihsu/OOTDiffusion/resolve/main/checkpoints/humanparsing/parsing_lip.onnx \
     --relative-path models/onnx \
     --filename parsing_lip.onnx
-
-RUN cd custom_nodes && git clone https://github.com/yolain/ComfyUI-Easy-Use && pip install -r ComfyUI-Easy-Use/requirements.txt
-RUN cd custom_nodes && git clone https://github.com/StableDiffusionVN/SDVN_Comfy_node && pip install -r SDVN_Comfy_node/requirements.txt
