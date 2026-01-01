@@ -4,6 +4,7 @@ RUN comfy-node-install comfyui-kjnodes rgthree-comfy ComfyUI_essentials LanPaint
 
 RUN cd comfyui/custom_nodes && git clone https://github.com/yolain/ComfyUI-Easy-Use && pip install -r ComfyUI-Easy-Use/requirements.txt
 RUN cd comfyui/custom_nodes && git clone https://github.com/StableDiffusionVN/SDVN_Comfy_node && pip install -r SDVN_Comfy_node/requirements.txt
+RUN cd comfyui/custom_nodes && git clone https://github.com/chflame163/ComfyUI_LayerStyle.git && pip install -r ComfyUI_LayerStyle/requirements.txt
 
 RUN comfy model download \
     --url https://huggingface.co/Comfy-Org/Qwen-Image_ComfyUI/resolve/main/split_files/text_encoders/qwen_2.5_vl_7b_fp8_scaled.safetensors \ 
