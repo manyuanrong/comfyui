@@ -26,6 +26,9 @@ jobs:
       - name: Check free disk space
         run: df -h /
 
+      - name: Install hf CLI
+        run: pip install "huggingface-hub>=0.26"
+
       - name: Login to HuggingFace
         run: echo "${{ secrets.HF_TOKEN }}" | hf auth login --token-stdin
 
