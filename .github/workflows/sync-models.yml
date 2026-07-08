@@ -30,7 +30,7 @@ jobs:
         run: pip install "huggingface-hub>=0.26"
 
       - name: Login to HuggingFace
-        run: echo "${{ secrets.HF_TOKEN }}" | hf auth login --token-stdin
+        run: hf auth login --token "${{ secrets.HF_TOKEN }}"
 
       # ------------------------------------------------------------------
       # Text Encoder: Qwen3-VL 4B fp8 (~4GB)
