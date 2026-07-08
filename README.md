@@ -9,7 +9,7 @@
 
 | 组件 | 详情 |
 |------|------|
-| **模型** | [catlover1937/moody-krea-mix](https://huggingface.co/catlover1937/moody-krea-mix) v3G — Krea 2 Turbo 微调 |
+| **模型** | [manyuanrong/kera2-models](https://huggingface.co/manyuanrong/kera2-models) — 统一模型仓库 |
 | **量化** | INT8 tensorwise (13.5GB)，CUDA 13.0 原生高效推理 |
 | **Text Encoder** | Qwen3-VL 4B fp8 (`qwen3vl_4b_fp8_scaled.safetensors`) |
 | **VAE** | Qwen Image VAE (`qwen_image_vae.safetensors`) |
@@ -20,58 +20,54 @@
 ## 架构
 
 ```
-Docker Container
-├── start.sh          → SSH + GPU预检 → 启动 ComfyUI (后台) → 启动 Handler
+Docker Container (~5GB, no models)
+├── start.sh          → SSH + GPU预检 → 链接HF缓存模型 → 启动ComfyUI → 启动Handler
 ├── handler.py        → 接收 API 请求，通过 WebSocket 提交/监控 ComfyUI 工作流
-├── src/
-│   ├── extra_model_paths.yaml   → 模型路径映射
-│   └── network_volume.py        → Network Volume 诊断工具
 └── /comfyui/
-    └── models/
-        ├── text_encoders/    ← Qwen3-VL 4B (baked in, ~4GB)
-        ├── vae/              ← Qwen Image VAE (baked in, ~200MB)
-        └── diffusion_models/ ← moody-krea-mix (HF Model Cache, ~13.5GB)
+    └── models/       ← start.sh 从 HF cache symlink 模型到此处
+
+RunPod Model Cache (manyuanrong/kera2-models)
+├── text_encoders/qwen3vl_4b_fp8_scaled.safetensors    (~4GB)
+├── vae/qwen_image_vae.safetensors                      (~200MB)
+└── diffusion_models/Moody-Krea-Mix-v3G_00001__int8_tensorwise.safetensors (~13.5GB)
 ```
 
 ## 模型策略
 
-- **主模型** (`Moody-Krea-Mix-v3G_00001__int8_tensorwise.safetensors`): RunPod HuggingFace Model Cache
-  - 在 RunPod Console 的 Endpoint 配置中添加 `catlover1937/moody-krea-mix`
-  - 模型自动下载到 `/runpod-volume/huggingface-cache/hub/`
-  - 不计费下载时间
-- **Text Encoder + VAE**: 直接烘焙在 Docker 镜像中（相对稳定，不会频繁变更）
+所有模型集中在 **[manyuanrong/kera2-models](https://huggingface.co/manyuanrong/kera2-models)**，
+通过 **RunPod Model Cache** 自动缓存到 `/runpod-volume/huggingface-cache/`。
+
+- Docker 镜像保持轻量（~5GB，不含模型）
+- 模型下载不计费、不计入冷启动计费时间
+- `start.sh` 启动时自动 symlink 缓存模型到 ComfyUI 目录
+- 模型更新通过 `.github/workflows/sync-models.yml` 自动同步
 
 ## 快速开始
 
-### 1. 推送代码到 GitHub
+### 1. 同步模型到 HF 仓库（首次）
 
-```bash
-git init && git add -A && git commit -m "Kera2: Krea 2 Turbo serverless worker"
-git remote add origin git@github.com:<你的用户名>/kera2.git
-git push -u origin main
-```
+在 GitHub 仓库的 **Actions** 标签页，手动运行 **"Sync Models to HuggingFace"** workflow。
+> 需要先在 GitHub Settings → Secrets 中添加 `HF_TOKEN`（HuggingFace 写权限 token）
 
 ### 2. 在 RunPod Console 部署（GitHub 集成，零本地构建）
 
 1. 打开 [RunPod Settings → Connections](https://console.runpod.io/user/settings)，授权 GitHub 访问你的仓库
 2. 进入 [Serverless](https://console.runpod.io/serverless) → **New Endpoint**
-3. 选择 **Import Git Repository**，搜索并选择 `kera2`
+3. 选择 **Import Git Repository**，搜索并选择 `comfyui`
 4. 配置：
    - **Branch**: `main`
    - **Dockerfile Path**: `Dockerfile`（根目录，默认）
 5. 点击 Next，配置 Endpoint：
    - **GPU**: 推荐 NVIDIA RTX 4090 / L40S / A40（至少 24GB VRAM）
-   - **Model Cache**: 添加 `catlover1937/moody-krea-mix`
+   - **Model Cache**: 添加 `manyuanrong/kera2-models`
    - **Environment Variables**（可选）:
      - `COMFY_LOG_LEVEL=INFO`
      - `REFRESH_WORKER=true`
 6. 点击 **Deploy Endpoint**，RunPod 自动构建并部署
 
-> ⚠️ **构建限制**：Docker build ≤ 30 分钟，镜像 ≤ 80GB，CPU-only。我们的 Dockerfile 已为此优化（预计 ~15 分钟）
-
 ### 3. 更新代码（发布新版本）
 
-修改代码后 push 到 GitHub，然后在 GitHub 仓库页面 **创建 Release**，RunPod 会自动触发重新构建。
+修改代码后 push 到 GitHub，然后在 GitHub 仓库页面 **创建 Release**，RunPod 会自动触发重新构建。镜像 ~5GB，构建约 8-10 分钟。
 
 ### 4. 调用 API
 
@@ -159,14 +155,13 @@ curl -X POST \
 
 当 RunPod 缓存模型后，文件位于：
 ```
-/runpod-volume/huggingface-cache/hub/models--catlover1937--moody-krea-mix/snapshots/<hash>/
+/runpod-volume/huggingface-cache/hub/models--manyuanrong--kera2-models/snapshots/<hash>/
+├── text_encoders/
+├── vae/
+└── diffusion_models/
 ```
 
-如果需要手动复制到 ComfyUI 目录（非必须，`extra_model_paths.yaml` 已配置路径映射）：
-```bash
-cp /runpod-volume/huggingface-cache/hub/models--catlover1937--moody-krea-mix/snapshots/*/Moody-Krea-Mix-v3G_00001__int8_tensorwise.safetensors \
-   /comfyui/models/diffusion_models/
-```
+`start.sh` 在 ComfyUI 启动前自动将这些文件 symlink 到 `/comfyui/models/` 对应目录。
 
 ## License
 

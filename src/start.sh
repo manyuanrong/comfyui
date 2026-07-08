@@ -52,6 +52,39 @@ echo "kera2: GPU available — $GPU_CHECK"
 # ---- PID file for health checks ----
 COMFY_PID_FILE="/tmp/comfyui.pid"
 
+# ---- Link HF cached models into ComfyUI directories ----
+# RunPod Model Cache downloads manyuanrong/kera2-models to:
+#   /runpod-volume/huggingface-cache/hub/models--manyuanrong--kera2-models/snapshots/<hash>/
+# Repo structure mirrors ComfyUI model types:
+#   text_encoders/  vae/  diffusion_models/
+echo "kera2: Linking HF cached models..."
+HF_CACHE="/runpod-volume/huggingface-cache/hub/models--manyuanrong--kera2-models"
+if [ -d "$HF_CACHE" ]; then
+    for snapshot in "$HF_CACHE"/snapshots/*/; do
+        [ -d "$snapshot" ] || continue
+        echo "kera2: Found snapshot: $snapshot"
+        # Each subdirectory in the repo maps to a ComfyUI model type
+        for model_type in text_encoders vae diffusion_models; do
+            src_dir="$snapshot/$model_type"
+            dest_dir="/comfyui/models/$model_type"
+            if [ -d "$src_dir" ]; then
+                mkdir -p "$dest_dir"
+                for f in "$src_dir"/*.safetensors; do
+                    [ -f "$f" ] || continue
+                    base="$(basename "$f")"
+                    if [ ! -e "$dest_dir/$base" ]; then
+                        ln -sf "$f" "$dest_dir/$base"
+                        echo "kera2:   $model_type/$base → linked"
+                    fi
+                done
+            fi
+        done
+    done
+else
+    echo "kera2: WARNING — HF cache not found at $HF_CACHE"
+    echo "kera2: Ensure RunPod Model Cache is configured for: manyuanrong/kera2-models"
+fi
+
 # ---- Start ComfyUI in background ----
 echo "kera2: Starting ComfyUI..."
 python -u /comfyui/main.py \
