@@ -1,0 +1,36 @@
+{
+  "tests": [
+    {
+      "name": "krea2_turbo_basic",
+      "input": {
+        "workflow": {
+          "1": { "inputs": { "unet_name": "Moody-Krea-Mix-v3G_00001__int8_tensorwise.safetensors", "weight_dtype": "default" }, "class_type": "UNETLoader" },
+          "2": { "inputs": { "clip_name": "qwen3vl_4b_fp8_scaled.safetensors", "type": "krea2" }, "class_type": "CLIPLoader" },
+          "3": { "inputs": { "vae_name": "qwen_image_vae.safetensors" }, "class_type": "VAELoader" },
+          "4": { "inputs": { "text": "a beautiful sunset over mountains, digital art, highly detailed, cinematic lighting", "clip": ["2", 0] }, "class_type": "CLIPTextEncode" },
+          "5": { "inputs": { "text": "", "clip": ["2", 0] }, "class_type": "CLIPTextEncode" },
+          "6": { "inputs": { "width": 1024, "height": 1024, "batch_size": 1 }, "class_type": "EmptySD3LatentImage" },
+          "7": { "inputs": { "seed": 42, "steps": 8, "cfg": 0.0, "sampler_name": "euler", "scheduler": "simple", "denoise": 1.0, "model": ["1", 0], "positive": ["4", 0], "negative": ["5", 0], "latent_image": ["6", 0] }, "class_type": "KSampler" },
+          "8": { "inputs": { "samples": ["7", 0], "vae": ["3", 0] }, "class_type": "VAEDecode" },
+          "9": { "inputs": { "filename_prefix": "Kera2", "images": ["8", 0] }, "class_type": "SaveImage" }
+        }
+      },
+      "timeout": 300000
+    }
+  ],
+  "config": {
+    "gpuTypeId": "NVIDIA GeForce RTX 4090",
+    "gpuCount": 1,
+    "env": [
+      {
+        "key": "COMFY_LOG_LEVEL",
+        "value": "INFO"
+      },
+      {
+        "key": "REFRESH_WORKER",
+        "value": "true"
+      }
+    ],
+    "allowedCudaVersions": ["13.0"]
+  }
+}

@@ -52,32 +52,6 @@ echo "kera2: GPU available — $GPU_CHECK"
 # ---- PID file for health checks ----
 COMFY_PID_FILE="/tmp/comfyui.pid"
 
-# ---- Link HF cached models into ComfyUI directories ----
-# RunPod Model Cache stores files at:
-#   /runpod-volume/huggingface-cache/hub/models--{org}--{repo}/snapshots/{hash}/
-# ComfyUI expects them at /comfyui/models/{type}/ or /runpod-volume/models/{type}/
-echo "kera2: Linking HF cached models..."
-if [ -d "/runpod-volume/huggingface-cache/hub" ]; then
-    # Link moody-krea-mix diffusion models
-    HF_CACHE="/runpod-volume/huggingface-cache/hub/models--catlover1937--moody-krea-mix"
-    DEST="/comfyui/models/diffusion_models"
-    if [ -d "$HF_CACHE" ]; then
-        mkdir -p "$DEST"
-        for snapshot in "$HF_CACHE"/snapshots/*/; do
-            [ -d "$snapshot" ] || continue
-            echo "kera2: Linking models from $snapshot to $DEST/"
-            for f in "$snapshot"*.safetensors; do
-                [ -f "$f" ] || continue
-                base="$(basename "$f")"
-                if [ ! -e "$DEST/$base" ]; then
-                    ln -sf "$f" "$DEST/$base"
-                    echo "kera2:   Linked $base"
-                fi
-            done
-        done
-    fi
-fi
-
 # ---- Start ComfyUI in background ----
 echo "kera2: Starting ComfyUI..."
 python -u /comfyui/main.py \
