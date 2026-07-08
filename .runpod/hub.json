@@ -1,0 +1,21 @@
+{
+    "title": "Kera2",
+    "description": "Krea 2 Turbo (moody-krea-mix) serverless worker — INT8 quantized, CUDA 13.0, 8-step generation",
+    "type": "serverless",
+    "category": "image",
+    "iconUrl": "https://cpjrphpz3t5wbwfe.public.blob.vercel-storage.com/comfy-ui.png",
+    "config": {
+        "runsOn": "GPU",
+        "containerDiskInGb": 50,
+        "env": [
+            {
+                "key": "COMFY_LOG_LEVEL",
+                "value": "INFO"
+            },
+            {
+                "key": "REFRESH_WORKER",
+                "value": "true"
+            }
+        ]
+    }
+}

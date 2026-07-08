@@ -50,7 +50,7 @@ RUN uv pip install pip setuptools wheel \
     && for r in /comfyui/custom_nodes/*/requirements.txt; do \
          [ -f "$r" ] && uv pip install -r "$r" || true; \
        done \
-    && uv pip install "transformers>=4.50.3,<5" "huggingface-hub<1.0"
+    && uv pip install "transformers>=4.50.3" "huggingface-hub>=0.26"
 
 # ---------------------------------------------------------------------------
 # Layer 3: Krea 2 models baked into image (text encoder + VAE)
@@ -74,7 +74,7 @@ RUN cd /comfyui && timeout 300 python main.py --quick-test-for-ci --cpu
 # ---------------------------------------------------------------------------
 # Layer 5: Handler deps + application code
 # ---------------------------------------------------------------------------
-RUN uv pip install runpod requests websocket-client
+RUN uv pip install "runpod~=1.10.0" requests websocket-client
 
 WORKDIR /comfyui
 ADD src/extra_model_paths.yaml ./
