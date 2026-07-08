@@ -41,21 +41,22 @@ ENV PATH="/opt/venv/bin:${PATH}"
 #   • Text encoder: Qwen3-VL 4B fp8 (~4GB)
 #   • VAE: Qwen Image VAE (~200MB)
 #   • Main model: moody-krea-mix int8 tensorwise (~13.5GB)
+# Downloaded to /tmp/models/ — moved into /comfyui after git clone in L3
 # ===========================================================================
-RUN mkdir -p /comfyui/models/text_encoders \
-             /comfyui/models/vae \
-             /comfyui/models/diffusion_models \
+RUN mkdir -p /tmp/models/text_encoders \
+             /tmp/models/vae \
+             /tmp/models/diffusion_models \
     && echo "Downloading Qwen3-VL text encoder (~4GB)..." \
     && wget -q --show-progress \
-        -O /comfyui/models/text_encoders/qwen3vl_4b_fp8_scaled.safetensors \
+        -O /tmp/models/text_encoders/qwen3vl_4b_fp8_scaled.safetensors \
         "https://huggingface.co/Comfy-Org/Qwen3-VL/resolve/main/text_encoders/qwen3vl_4b_fp8_scaled.safetensors" \
     && echo "Downloading Qwen Image VAE (~200MB)..." \
     && wget -q --show-progress \
-        -O /comfyui/models/vae/qwen_image_vae.safetensors \
+        -O /tmp/models/vae/qwen_image_vae.safetensors \
         "https://huggingface.co/Comfy-Org/Qwen-Image_ComfyUI/resolve/main/split_files/vae/qwen_image_vae.safetensors" \
     && echo "Downloading moody-krea-mix int8 model (~13.5GB)..." \
     && wget -q --show-progress \
-        -O /comfyui/models/diffusion_models/Moody-Krea-Mix-v3G_00001__int8_tensorwise.safetensors \
+        -O /tmp/models/diffusion_models/Moody-Krea-Mix-v3G_00001__int8_tensorwise.safetensors \
         "https://huggingface.co/catlover1937/moody-krea-mix/resolve/main/Moody-Krea-Mix-v3G_00001__int8_tensorwise.safetensors"
 
 # ===========================================================================
@@ -68,6 +69,9 @@ RUN uv pip install pip setuptools wheel \
     && echo "Cloning ComfyUI v0.27.0..." \
     && git clone --depth 1 --branch v0.27.0 \
         https://github.com/Comfy-Org/ComfyUI.git /comfyui \
+    && echo "Moving pre-downloaded models into ComfyUI..." \
+    && cp -r /tmp/models/* /comfyui/models/ \
+    && rm -rf /tmp/models \
     && echo "Installing ComfyUI dependencies..." \
     && uv pip install -r /comfyui/requirements.txt \
     && for r in /comfyui/custom_nodes/*/requirements.txt; do \
