@@ -1,0 +1,13 @@
+node_modules
+.changeset
+.git
+.github
+*.pyc
+__pycache__/
+.venv/
+venv/
+.vscode/
+*.log
+*.md
+!README.md
+.reasonix/

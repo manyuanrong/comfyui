@@ -1,0 +1,23 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+.venv/
+venv/
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Reasonix
+.reasonix/
+
+# Logs
+*.log
+
+# Docker (build context only, Dockerfile needs these)
+# note: .dockerignore handles Docker context separately
