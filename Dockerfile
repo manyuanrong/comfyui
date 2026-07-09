@@ -15,7 +15,7 @@
 #   L4: Handler + app code    ← changes most often (fast rebuild)
 # =============================================================================
 
-FROM nvidia/cuda:13.0.3-cudnn-runtime-ubuntu24.04
+FROM nvidia/cuda:12.6.3-cudnn-runtime-ubuntu24.04
 
 ENV DEBIAN_FRONTEND=noninteractive
 ENV PIP_PREFER_BINARY=1
@@ -42,12 +42,12 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 ENV PATH="/opt/venv/bin:${PATH}"
 
 # ===========================================================================
-# Layer 2: PyTorch nightly (CUDA 13.0) + ComfyUI + deps (cached — stable)
+# Layer 2: PyTorch nightly (CUDA 12.6) + ComfyUI + deps (cached — stable)
 # ===========================================================================
 RUN uv pip install pip setuptools wheel \
-    && echo "Installing PyTorch nightly for CUDA 13.0..." \
+    && echo "Installing PyTorch nightly for CUDA 12.6..." \
     && uv pip install --pre torch torchvision torchaudio \
-        --index-url https://download.pytorch.org/whl/nightly/cu130 \
+        --index-url https://download.pytorch.org/whl/nightly/cu126 \
     && echo "Cloning ComfyUI v0.27.0..." \
     && git clone --depth 1 --branch v0.27.0 \
         https://github.com/Comfy-Org/ComfyUI.git /comfyui \

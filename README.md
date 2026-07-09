@@ -10,10 +10,10 @@
 | 组件 | 详情 |
 |------|------|
 | **模型** | [manyuanrong/kera2-models](https://huggingface.co/manyuanrong/kera2-models) — 统一模型仓库 |
-| **量化** | INT8 tensorwise (13.5GB)，CUDA 13.0 原生高效推理 |
+| **量化** | INT8 tensorwise (13.5GB)，CUDA 12.6 + PyTorch nightly |
 | **Text Encoder** | Qwen3-VL 4B fp8 (`qwen3vl_4b_fp8_scaled.safetensors`) |
 | **VAE** | Qwen Image VAE (`qwen_image_vae.safetensors`) |
-| **CUDA** | 13.0.3 + PyTorch nightly |
+| **CUDA** | 12.6.3 + PyTorch nightly |
 | **ComfyUI** | ≥ v0.27.0（原生 INT8 + Krea 2 支持） |
 | **推理设置** | 8 steps, CFG 0.0, 1024-2048px |
 
